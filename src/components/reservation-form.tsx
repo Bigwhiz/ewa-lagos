@@ -1,17 +1,12 @@
 "use client";
 
-import { useId, useState, useSyncExternalStore } from "react";
+import { useEffect, useId, useState, useSyncExternalStore } from "react";
 import { site } from "@/content/site";
 import { formatClock } from "@/lib/hours";
 import { whatsappUrl } from "@/lib/order";
-import {
-  buildReservationMessage,
-  MAX_PARTY,
-  reservationSchema,
-  reservationSlots,
-  weekdayOf,
-  type Reservation,
-} from "@/lib/reservation";
+import { buildReservationMessage, MAX_PARTY, reservationSlots, weekdayOf } from "@/lib/reservation";
+import type { Reservation } from "@/lib/reservation-schema";
+import { openWhatsApp } from "./order/open-whatsapp";
 import { WhatsAppIcon } from "./order/order-sheet";
 
 type Errors = Partial<Record<keyof Reservation, string>>;
@@ -26,12 +21,17 @@ export function ReservationForm() {
   const [date, setDate] = useState("");
   const [errors, setErrors] = useState<Errors>({});
 
+  useEffect(() => {
+    void import("@/lib/reservation-schema"); // warm the cache; see order-sheet.tsx
+  }, []);
+
   const slots = date ? reservationSlots(site.hours[weekdayOf(date)]) : [];
   const closedThatDay = date !== "" && slots.length === 0;
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
+    const { reservationSchema } = await import("@/lib/reservation-schema");
     const parsed = reservationSchema(site.hours, lagosToday()).safeParse({
       name: form.get("name"),
       date: form.get("date"),
@@ -46,7 +46,7 @@ export function ReservationForm() {
       return;
     }
     setErrors({});
-    window.open(whatsappUrl(site.whatsapp, buildReservationMessage(parsed.data, site.name)), "_blank", "noopener,noreferrer");
+    openWhatsApp(whatsappUrl(site.whatsapp, buildReservationMessage(parsed.data, site.name)));
   }
 
   const field =

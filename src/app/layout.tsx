@@ -5,23 +5,28 @@ import { OrderProvider } from "@/components/order/order-provider";
 import { OrderSheet } from "@/components/order/order-sheet";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { menu } from "@/content/menu";
 import { site } from "@/content/site";
+import { validateContent } from "@/content/validate";
 import { restaurantJsonLd } from "@/lib/structured-data";
 import "./globals.css";
 
+validateContent({ menu, hours: site.hours });
+
 // Self-hosted by next/font at build time: no request to Google, no layout shift while fonts load.
-// The Vietnamese subset carries the Yoruba letters with dots below (Ẹ, ọ, ṣ).
+// `subsets` only controls preloading. The Yoruba letters with dots below (Ẹ, ọ, ṣ) live in a smaller
+// extra file that the browser fetches on its own, only on pages that use them.
 const display = Cormorant_Garamond({
   variable: "--font-cormorant",
-  subsets: ["latin", "vietnamese"],
-  weight: ["300", "400", "500"],
+  subsets: ["latin"],
+  weight: ["300", "400"],
   style: ["normal", "italic"],
   display: "swap",
 });
 
 const sans = Manrope({
   variable: "--font-manrope",
-  subsets: ["latin", "vietnamese"],
+  subsets: ["latin"],
   display: "swap",
 });
 

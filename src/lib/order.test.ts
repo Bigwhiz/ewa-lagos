@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { getDish, menu, menuSchema } from "@/content/menu";
-import { buildOrderMessage, customerSchema, priceOrder, whatsappUrl } from "@/lib/order";
+import { getDish, menu } from "@/content/menu";
+import { menuSchema, validateContent } from "@/content/validate";
+import { site } from "@/content/site";
+import { buildOrderMessage, priceOrder, whatsappUrl } from "@/lib/order";
+import { customerSchema } from "@/lib/order-schema";
 
 const cart = { "smoked-party-jollof": 2, dodo: 3, "chocolate-zobo": 1 };
 
@@ -78,11 +81,12 @@ describe("customerSchema", () => {
 
 describe("menu data", () => {
   it("is valid and every category has dishes", () => {
+    expect(() => validateContent({ menu, hours: site.hours })).not.toThrow();
     for (const c of menu.categories) expect(menu.dishes.some((d) => d.category === c.id)).toBe(true);
   });
 
   it("rejects duplicate ids and unknown categories", () => {
-    const dish = { id: "a", name: "A", description: "A", price: 1, category: "x" };
+    const dish = { id: "a", name: "A", description: "A", price: 1, category: "x", tags: [] };
     const result = menuSchema.safeParse({ categories: [{ id: "y", name: "Y" }], dishes: [dish, dish] });
     expect(result.success).toBe(false);
     expect(result.error?.issues.map((i) => i.message)).toEqual([

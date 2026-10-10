@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { site } from "@/content/site";
-import { buildReservationMessage, reservationSchema, reservationSlots, weekdayOf } from "@/lib/reservation";
+import { buildReservationMessage, reservationSlots, weekdayOf } from "@/lib/reservation";
+import { reservationSchema } from "@/lib/reservation-schema";
 
 describe("reservationSlots", () => {
   it("offers lunch and dinner slots up to 90 minutes before close", () => {

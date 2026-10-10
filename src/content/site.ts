@@ -1,6 +1,6 @@
-import { weeklyHoursSchema, type WeeklyHours } from "@/lib/hours";
+import type { WeeklyHours } from "@/lib/hours";
 
-const hours: WeeklyHours = weeklyHoursSchema.parse([
+const hours: WeeklyHours = [
   /* Sun */ [{ open: "13:00", close: "21:00" }],
   /* Mon */ [],
   /* Tue */ [{ open: "12:00", close: "15:00" }, { open: "18:00", close: "22:00" }],
@@ -8,7 +8,7 @@ const hours: WeeklyHours = weeklyHoursSchema.parse([
   /* Thu */ [{ open: "12:00", close: "15:00" }, { open: "18:00", close: "22:00" }],
   /* Fri */ [{ open: "12:00", close: "15:00" }, { open: "18:00", close: "23:00" }],
   /* Sat */ [{ open: "12:00", close: "15:00" }, { open: "18:00", close: "23:00" }],
-]);
+];
 
 export const site = {
   name: "Ẹwà",

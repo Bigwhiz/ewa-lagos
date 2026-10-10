@@ -1,25 +1,11 @@
-import { z } from "zod";
 import type { Dish } from "@/content/menu";
 import { formatNaira } from "@/lib/money";
+import type { Customer } from "@/lib/order-schema";
 
 export const MAX_QUANTITY = 20;
 
 /** What the browser stores: just ids and counts. Names and prices always come from the menu file. */
 export type CartLines = Record<string, number>;
-
-export const customerSchema = z
-  .object({
-    name: z.string().trim().min(2, "Please tell us your name").max(80),
-    fulfilment: z.enum(["pickup", "delivery"]),
-    address: z.string().trim().max(240).optional(),
-    notes: z.string().trim().max(400).optional(),
-  })
-  .refine((c) => c.fulfilment === "pickup" || (c.address?.length ?? 0) >= 6, {
-    path: ["address"],
-    message: "Add a delivery address",
-  });
-
-export type Customer = z.infer<typeof customerSchema>;
 
 export type PricedLine = { dish: Dish; quantity: number; lineTotal: number };
 export type PricedOrder = { lines: PricedLine[]; itemCount: number; total: number };

@@ -1,21 +1,8 @@
-import { z } from "zod";
-
 /** 0 = Sunday … 6 = Saturday, matching Date#getDay. */
 export type Weekday = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
-const clockTime = z
-  .string()
-  .regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Use 24-hour HH:MM");
-
-const serviceSchema = z
-  .object({ open: clockTime, close: clockTime })
-  .refine((s) => toMinutes(s.open) < toMinutes(s.close), {
-    message: "A service must close after it opens (same day)",
-  });
-
-export const weeklyHoursSchema = z.array(z.array(serviceSchema)).length(7);
-
-export type Service = z.infer<typeof serviceSchema>;
+/** One sitting, in 24-hour "HH:MM" Lagos time. Validated at build time in content/validate.ts. */
+export type Service = { open: string; close: string };
 /** Index by Weekday. An empty array means closed all day. */
 export type WeeklyHours = Service[][];
 
@@ -30,7 +17,7 @@ export type OpenStatus =
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const WEEKDAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-function toMinutes(hhmm: string): number {
+export function toMinutes(hhmm: string): number {
   const [h, m] = hhmm.split(":").map(Number);
   return h * 60 + m;
 }

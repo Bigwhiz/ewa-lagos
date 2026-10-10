@@ -1,5 +1,5 @@
-import { z } from "zod";
-import { formatClock, type Service, type WeeklyHours } from "@/lib/hours";
+import { formatClock, type Service } from "@/lib/hours";
+import type { Reservation } from "@/lib/reservation-schema";
 
 export const LAST_SEATING_BEFORE_CLOSE = 90; // minutes
 export const MAX_PARTY = 8;
@@ -25,23 +25,6 @@ export function weekdayOf(isoDate: string): number {
   const [y, m, d] = isoDate.split("-").map(Number);
   return new Date(Date.UTC(y, m - 1, d)).getUTCDay();
 }
-
-export function reservationSchema(hours: WeeklyHours, todayIso: string) {
-  return z
-    .object({
-      name: z.string().trim().min(2, "Please tell us your name").max(80),
-      date: z.iso.date("Choose a date").refine((d) => d >= todayIso, "Choose today or a later date"),
-      time: z.string().regex(/^\d{2}:\d{2}$/, "Choose a time"),
-      guests: z.coerce.number().int().min(1).max(MAX_PARTY),
-      occasion: z.string().trim().max(200).optional(),
-    })
-    .refine((r) => reservationSlots(hours[weekdayOf(r.date)]).includes(r.time), {
-      path: ["time"],
-      message: "We're not seating at that time",
-    });
-}
-
-export type Reservation = z.infer<ReturnType<typeof reservationSchema>>;
 
 export function buildReservationMessage(r: Reservation, restaurantName: string): string {
   const date = new Intl.DateTimeFormat("en-GB", {

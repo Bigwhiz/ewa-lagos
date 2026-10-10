@@ -1,17 +1,25 @@
-import { z } from "zod";
 import { MAX_QUANTITY, type CartLines } from "@/lib/order";
 
 const STORAGE_KEY = "ewa.order.v1";
 const EMPTY: CartLines = Object.freeze({}) as CartLines;
-const storedSchema = z.record(z.string(), z.number().int().min(1).max(MAX_QUANTITY));
+
+/** Storage can be edited by hand, so check its shape before trusting it. */
+function isCartLines(value: unknown): value is CartLines {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    !Array.isArray(value) &&
+    Object.values(value).every((q) => Number.isInteger(q) && q >= 1 && q <= MAX_QUANTITY)
+  );
+}
 
 let lines: CartLines | null = null;
 const listeners = new Set<() => void>();
 
 function read(): CartLines {
   try {
-    const parsed = storedSchema.safeParse(JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}"));
-    return parsed.success ? parsed.data : EMPTY;
+    const parsed: unknown = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}");
+    return isCartLines(parsed) ? parsed : EMPTY;
   } catch {
     return EMPTY; // storage blocked (private mode) or corrupted JSON
   }

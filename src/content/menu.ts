@@ -1,11 +1,10 @@
-import { z } from "zod";
 import { photos } from "@/content/photos";
 
 /**
  * The whole menu lives in this file. Adding a dish means adding one object to `dishes`;
  * every page, the order sheet and the WhatsApp message read from here.
- * The schema runs at build time, so a typo (unknown category, duplicate id, bad price) fails the build
- * instead of shipping a broken menu.
+ * content/validate.ts checks it during the build, so a typo (unknown category, duplicate id, bad price)
+ * fails the build instead of shipping a broken menu. No validation code is sent to the browser.
  */
 
 export const DIETARY_TAGS = {
@@ -17,45 +16,23 @@ export const DIETARY_TAGS = {
   "contains-nuts": { label: "Contains nuts", short: "N" },
 } as const;
 
-const tagSchema = z.enum(Object.keys(DIETARY_TAGS) as [keyof typeof DIETARY_TAGS, ...(keyof typeof DIETARY_TAGS)[]]);
-
-const categorySchema = z.object({
-  id: z.string().regex(/^[a-z0-9-]+$/),
-  name: z.string().min(1),
-  note: z.string().optional(),
-});
-
-const dishSchema = z.object({
-  id: z.string().regex(/^[a-z0-9-]+$/, "ids are lowercase-kebab-case"),
-  name: z.string().min(1),
-  description: z.string().min(1),
+export type DietaryTag = keyof typeof DIETARY_TAGS;
+export type Category = { id: string; name: string; note?: string };
+export type Dish = {
+  /** lowercase-kebab-case, unique */
+  id: string;
+  name: string;
+  description: string;
   /** Whole naira */
-  price: z.number().int().positive(),
-  category: z.string(),
-  tags: z.array(tagSchema).default([]),
-  signature: z.boolean().default(false),
-  image: z.object({ src: z.string(), alt: z.string().min(1) }).optional(),
-});
+  price: number;
+  category: string;
+  tags: DietaryTag[];
+  signature?: boolean;
+  image?: { src: string; alt: string };
+};
+export type Menu = { categories: Category[]; dishes: Dish[] };
 
-export const menuSchema = z
-  .object({ categories: z.array(categorySchema).min(1), dishes: z.array(dishSchema).min(1) })
-  .superRefine(({ categories, dishes }, ctx) => {
-    const categoryIds = new Set(categories.map((c) => c.id));
-    const seen = new Set<string>();
-    dishes.forEach((dish, i) => {
-      if (seen.has(dish.id)) ctx.addIssue({ code: "custom", path: ["dishes", i, "id"], message: `Duplicate dish id "${dish.id}"` });
-      seen.add(dish.id);
-      if (!categoryIds.has(dish.category))
-        ctx.addIssue({ code: "custom", path: ["dishes", i, "category"], message: `Unknown category "${dish.category}"` });
-    });
-  });
-
-export type DietaryTag = z.infer<typeof tagSchema>;
-export type Category = z.infer<typeof categorySchema>;
-export type Dish = z.infer<typeof dishSchema>;
-export type Menu = z.infer<typeof menuSchema>;
-
-export const menu: Menu = menuSchema.parse({
+export const menu: Menu = {
   categories: [
     { id: "to-begin", name: "To Begin" },
     { id: "from-home", name: "From Home", note: "Recipes from our mothers' kitchens, plated the way we like them now." },
@@ -265,7 +242,7 @@ export const menu: Menu = menuSchema.parse({
     { id: "tiger-nut-date", name: "Tiger Nut & Date", description: "Cold-pressed tiger nut milk, dates, a little nutmeg.", price: 7500, category: "from-the-bar", tags: ["vegan", "gluten-free"] },
     { id: "pressed-juice", name: "Pressed Juice of the Day", description: "Seasonal fruit, pressed each morning.", price: 6000, category: "from-the-bar", tags: ["vegan", "gluten-free"] },
   ],
-});
+};
 
 export function getDish(id: string): Dish | undefined {
   return menu.dishes.find((d) => d.id === id);

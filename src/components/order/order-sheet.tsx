@@ -4,7 +4,9 @@ import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 import { site } from "@/content/site";
 import { formatNaira } from "@/lib/money";
-import { buildOrderMessage, customerSchema, whatsappUrl, type Customer } from "@/lib/order";
+import { buildOrderMessage, whatsappUrl } from "@/lib/order";
+import type { Customer } from "@/lib/order-schema";
+import { openWhatsApp } from "./open-whatsapp";
 import { useOrder } from "./order-provider";
 import { QuantityControl } from "./quantity-control";
 
@@ -17,6 +19,11 @@ export function OrderSheet() {
   const [errors, setErrors] = useState<Errors>({});
   const id = useId();
 
+  // Fetch the validation code once the page is idle, so it's cached by the time anyone submits.
+  useEffect(() => {
+    void import("@/lib/order-schema");
+  }, []);
+
   // React state is the source of truth; the native <dialog> gives us focus trapping, Esc and a backdrop for free.
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -25,9 +32,10 @@ export function OrderSheet() {
     if (!sheetOpen && dialog.open) dialog.close();
   }, [sheetOpen]);
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
+    const { customerSchema } = await import("@/lib/order-schema");
     const parsed = customerSchema.safeParse({
       name: form.get("name"),
       fulfilment,
@@ -44,7 +52,7 @@ export function OrderSheet() {
 
     setErrors({});
     const message = buildOrderMessage(order, parsed.data, site.name);
-    window.open(whatsappUrl(site.whatsapp, message), "_blank", "noopener,noreferrer");
+    openWhatsApp(whatsappUrl(site.whatsapp, message));
   }
 
   const field =

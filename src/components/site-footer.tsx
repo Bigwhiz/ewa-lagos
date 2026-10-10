@@ -59,7 +59,7 @@ export function SiteFooter() {
         </div>
       </div>
 
-      <div className="container-page flex flex-col gap-4 border-t border-line py-7 text-xs text-stone md:flex-row md:items-center md:justify-between">
+      <div className="container-page flex flex-col gap-4 border-t border-line pt-7 pb-24 text-xs md:pb-7 text-stone md:flex-row md:items-center md:justify-between">
         <p>© {site.name}, Lagos. Made with care in Ikoyi.</p>
         <nav aria-label="Footer">
           <ul className="flex gap-6">
