@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Ẹwà — Plated in Lagos
 
-## Getting Started
+A website for Ẹwà, a fictional fine-dining restaurant in Ikoyi, Lagos, that serves Nigerian recipes and international dishes. Guests browse the menu, build an order, and send it to the restaurant on WhatsApp, pre-written. They can also request a table the same way.
 
-First, run the development server:
+**Stack:** Next.js 16 (App Router, Cache Components), TypeScript (strict), Tailwind CSS v4, Zod, Vitest.
+
+## Run it
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev        # http://localhost:4310
+npm test           # unit tests (Vitest)
+npm run typecheck
+npm run lint
+npm run build && npx next start -p 4310
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Optional environment variables (see `.env.example`):
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Variable | Purpose |
+|---|---|
+| `NEXT_PUBLIC_SITE_URL` | Absolute URL for canonical links, the sitemap and Open Graph tags |
+| `NEXT_PUBLIC_WHATSAPP_NUMBER` | The restaurant's WhatsApp number, digits only (for example `2348012345678`) |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## How it's built
 
-## Learn More
+```
+src/
+  content/      menu.ts, site.ts (hours, address), photos.ts — the only files a menu change touches
+                validate.ts — full Zod checks of that content, run on the server at build time
+  lib/          plain TypeScript, no React: pricing, the WhatsApp message, open/closed logic, reservations
+                *-schema.ts — form validation (zod/mini), loaded on demand
+  components/   header, footer, open-status, order/ (cart store, sheet, controls), reservation form
+  app/          one folder per page, plus opengraph-image, sitemap, robots, icon
+```
 
-To learn more about Next.js, take a look at the following resources:
+### WhatsApp ordering
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. The cart is a small external store (`components/order/cart-store.ts`), read with React's `useSyncExternalStore`. It keeps **only dish ids and quantities** in `localStorage`.
+2. Every render re-prices those ids from `content/menu.ts` (`priceOrder`). A stale or edited cart can't produce a wrong total: removed dishes and bad quantities are dropped.
+3. `buildOrderMessage` writes the order text, and `whatsappUrl` URL-encodes it into a `wa.me` link. Without encoding, newlines, `₦`, `&` and `#` would break the link.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### "Open now · Closes at 10pm"
 
-## Deploy on Vercel
+`getOpenStatus(hours, now, "Africa/Lagos")` reads the weekday and time **in Lagos** through `Intl.DateTimeFormat`, so a visitor in London or Tokyo sees the same status. Opening is inclusive and closing is exclusive: 9:59pm is open, 10:00pm is closed. The pages are static, so the server can't know the current time. `OpenStatus` renders neutral text on the server and fills in the real status in the browser, re-checking every 30 seconds.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Decisions
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Static everything.** Every page is pre-rendered at build time. The only thing that depends on the current time (open/closed) runs in the browser.
+- **One source of truth for content.** Pages, the cart, the message and the JSON-LD all read from `content/`. Adding a dish is one object in `menu.ts`.
+- **Validate where it's cheap.** Content is checked by full Zod on the server during `next build`, so a typo fails the build and never reaches visitors. Form input is checked with `zod/mini`, loaded by `import()` after the page has painted, which keeps it out of the first-load JavaScript.
+- **Integers for money.** Prices are whole naira, stored as integers.
+- **Native `<dialog>` for the order sheet.** Focus trapping, Esc to close and the backdrop come from the browser.
+- **CSS-only motion.** Reveal and header effects use scroll-driven animations. Visitors who prefer reduced motion get no movement.
+
+## Content and imagery
+
+All names, copy, prices and contact details are fictional. Photos are from Unsplash (Unsplash License) and are placeholders for the restaurant's own photography.
