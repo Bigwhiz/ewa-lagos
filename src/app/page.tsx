@@ -1,69 +1,160 @@
 import Image from "next/image";
+import { OpenStatus } from "@/components/open-status";
+import { SignatureCard } from "@/components/signature-card";
+import { HoursList } from "@/components/site-footer";
+import { ButtonLink, SectionIntro } from "@/components/ui";
+import { signatureDishes } from "@/content/menu";
+import { photos } from "@/content/photos";
+import { site } from "@/content/site";
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
+    <>
+      {/* Hero */}
+      <section className="relative isolate flex min-h-[100svh] items-end overflow-hidden">
         <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+          src={photos.heroPlate.src}
+          alt={photos.heroPlate.alt}
+          fill
+          preload
+          sizes="100vw"
+          className="-z-10 object-cover"
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(18_16_14/0.6)_0%,rgb(18_16_14/0.2)_30%,rgb(18_16_14/0.82)_68%,#12100e_100%),linear-gradient(90deg,rgb(18_16_14/0.55)_0%,transparent_60%)]"
+        />
+        <div className="container-page pt-40 pb-16 md:pb-24">
+          <p className="eyebrow text-brass">Ikoyi · Lagos</p>
+          <h1 className="mt-6 max-w-4xl text-[clamp(3.25rem,9vw,8.5rem)] leading-[0.92] font-light">
+            The food of home, <em className="text-brass/95">plated</em> with intention.
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <div className="mt-10 flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+            <p className="max-w-md text-[15px] leading-[1.75] text-ivory/80">
+              Nigerian recipes and international technique at one table. Lunch and dinner,
+              Tuesday to Sunday, or ordered to your door on WhatsApp.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <ButtonLink href="/menu">Order from the menu</ButtonLink>
+              <ButtonLink href="/contact" variant="outline">
+                Reserve a table
+              </ButtonLink>
+            </div>
+          </div>
+          <OpenStatus className="mt-12 text-xs tracking-wide text-ivory/70" />
+        </div>
+      </section>
+
+      {/* Meaning */}
+      <section className="container-page grid gap-12 py-28 md:grid-cols-12 md:py-40">
+        <p className="reveal font-display text-[clamp(5rem,16vw,13rem)] leading-[0.8] text-brass/90 md:col-span-5">
+          {site.name}
+        </p>
+        <div className="reveal md:col-span-6 md:col-start-7 md:pt-6">
+          <p className="eyebrow text-stone">/ɛ̀.wà/ · Yoruba · noun</p>
+          <p className="mt-6 font-display text-[clamp(1.75rem,3.2vw,2.6rem)] leading-[1.2]">
+            Beauty. The kind you notice in a well-set table, a slow-cooked sauce, a room that
+            makes you stay for one more glass.
           </p>
+          <p className="mt-8 max-w-lg text-[15px] leading-[1.8] text-stone">
+            We cook the dishes we grew up on with the patience of a fine-dining kitchen: peppers
+            fried down for hours, stocks built overnight, produce from farms in Epe and Ogun. Then
+            we set them beside the classics of the world, so a table can share egusi and a dry-aged
+            ribeye without anyone having to choose.
+          </p>
+          <div className="mt-10">
+            <ButtonLink href="/about" variant="outline">
+              Read our story
+            </ButtonLink>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+      </section>
+
+      {/* Signatures */}
+      <section className="border-t border-line py-28 md:py-36">
+        <div className="container-page">
+          <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+            <SectionIntro eyebrow="Signatures" title={<>Plates we&rsquo;re known for</>} className="reveal">
+              Every dish can be ordered for pickup or delivery. Add what you like and we&rsquo;ll
+              prepare a WhatsApp message with your order.
+            </SectionIntro>
+            <ButtonLink href="/menu" variant="outline">
+              The full menu
+            </ButtonLink>
+          </div>
+          <div className="mt-16 grid gap-x-8 gap-y-16 sm:grid-cols-2 lg:grid-cols-3">
+            {signatureDishes.map((dish) => (
+              <div key={dish.id} className="reveal">
+                <SignatureCard dish={dish} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* The room */}
+      <section className="relative isolate overflow-hidden">
+        <div className="grid md:grid-cols-2">
+          <div className="relative min-h-[28rem] md:min-h-[44rem]">
             <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
+              src={photos.diningRoom.src}
+              alt={photos.diningRoom.alt}
+              fill
+              sizes="(min-width: 768px) 50vw, 100vw"
+              className="object-cover"
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+          </div>
+          <div className="flex items-center bg-ink-2">
+            <div className="reveal px-[clamp(1rem,6vw,6rem)] py-20">
+              <SectionIntro eyebrow="The room" title="Forty-two seats, one long evening">
+                <p>
+                  Low brass light, deep banquettes and a kitchen you can watch from the bar. We take
+                  bookings for two to eight, and the private room seats up to twenty-four for
+                  birthdays, launches and long family lunches.
+                </p>
+              </SectionIntro>
+              <dl className="mt-12 grid grid-cols-3 gap-6 border-t border-line pt-8">
+                {[
+                  ["42", "Seats"],
+                  ["24", "Private room"],
+                  ["6", "Courses, tasting menu"],
+                ].map(([value, label]) => (
+                  <div key={label}>
+                    <dt className="sr-only">{label}</dt>
+                    <dd>
+                      <span className="block font-display text-5xl text-brass">{value}</span>
+                      <span className="mt-2 block text-xs text-stone">{label}</span>
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+              <div className="mt-12">
+                <ButtonLink href="/contact">Reserve a table</ButtonLink>
+              </div>
+            </div>
+          </div>
         </div>
-      </main>
-    </div>
+      </section>
+
+      {/* Visit */}
+      <section className="container-page grid gap-14 py-28 md:grid-cols-12 md:py-36">
+        <SectionIntro eyebrow="Visit" title="Find us in Ikoyi" className="reveal md:col-span-5">
+          <address className="not-italic">
+            {site.address.street}
+            <br />
+            {site.address.area}, {site.address.city}
+          </address>
+          <p className="mt-4">Valet parking from 6pm. Smart casual, please.</p>
+        </SectionIntro>
+        <div className="reveal md:col-span-6 md:col-start-7">
+          <HoursList />
+          <div className="mt-10 flex flex-wrap gap-3">
+            <ButtonLink href="/visit" variant="outline">
+              Directions &amp; details
+            </ButtonLink>
+          </div>
+        </div>
+      </section>
+    </>
   );
 }

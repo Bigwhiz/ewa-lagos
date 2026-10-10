@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { photos } from "@/content/photos";
 
 /**
  * The whole menu lives in this file. Adding a dish means adding one object to `dishes`;
@@ -66,13 +67,14 @@ export const menu: Menu = menuSchema.parse({
   dishes: [
     // To Begin
     {
-      id: "suya-beef-tartare",
-      name: "Suya Beef Tartare",
-      description: "Hand-cut beef fillet, house yaji, cured egg yolk, pickled shallot, cassava crisps.",
+      id: "suya-beef-carpaccio",
+      name: "Suya Beef Carpaccio",
+      description: "Seared beef fillet sliced thin, house yaji, roasted groundnuts, red chilli, herb salad.",
       price: 18500,
       category: "to-begin",
       tags: ["gluten-free", "spicy", "contains-nuts"],
       signature: true,
+      image: photos.carpaccio,
     },
     {
       id: "tiger-prawn-pepper-soup",
@@ -115,7 +117,16 @@ export const menu: Menu = menuSchema.parse({
       price: 32000,
       category: "from-home",
       tags: ["pescatarian", "gluten-free", "spicy"],
+    },
+    {
+      id: "prawns-ata-dindin",
+      name: "Tiger Prawns in Ata Dindin",
+      description: "Tiger prawns in slow-fried pepper sauce, coconut rice, coriander, lime.",
+      price: 38000,
+      category: "from-home",
+      tags: ["pescatarian", "gluten-free", "spicy"],
       signature: true,
+      image: photos.prawnsRice,
     },
     {
       id: "egusi-stone-bass",
@@ -124,7 +135,6 @@ export const menu: Menu = menuSchema.parse({
       price: 38000,
       category: "from-home",
       tags: ["pescatarian", "gluten-free"],
-      signature: true,
     },
     {
       id: "ofada-lamb-ayamase",
@@ -168,23 +178,27 @@ export const menu: Menu = menuSchema.parse({
       category: "the-world-table",
       tags: ["gluten-free", "contains-nuts"],
       signature: true,
+      image: photos.ribeye,
     },
     {
-      id: "lobster-linguine",
-      name: "Lagos Lobster Linguine",
-      description: "Fresh linguine, half a local lobster, bisque, scotch bonnet, lemon, parsley.",
-      price: 58000,
+      id: "tiger-prawn-linguine",
+      name: "Tiger Prawn Linguine",
+      description: "Fresh linguine, tiger prawns, cherry tomato, scotch bonnet, garlic, parsley.",
+      price: 46000,
       category: "the-world-table",
       tags: ["pescatarian", "spicy"],
       signature: true,
+      image: photos.linguine,
     },
     {
       id: "miso-salmon",
       name: "Miso-Glazed Salmon",
-      description: "Roasted salmon, miso and honey glaze, charred greens, sesame, jasmine rice.",
+      description: "Roasted salmon, miso and honey glaze, cucumber and mango salsa, wilted greens.",
       price: 44000,
       category: "the-world-table",
       tags: ["pescatarian"],
+      signature: true,
+      image: photos.salmon,
     },
     {
       id: "mushroom-risotto",
@@ -217,7 +231,16 @@ export const menu: Menu = menuSchema.parse({
       price: 13000,
       category: "to-finish",
       tags: ["vegetarian", "gluten-free"],
+    },
+    {
+      id: "tiger-nut-caramel",
+      name: "Tiger Nut Ice Cream & Salted Caramel",
+      description: "Tiger nut ice cream, warm salted caramel poured at the table, cocoa tuile.",
+      price: 12500,
+      category: "to-finish",
+      tags: ["vegetarian"],
       signature: true,
+      image: photos.caramel,
     },
     {
       id: "puff-puff",

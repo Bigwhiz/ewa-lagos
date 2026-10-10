@@ -32,3 +32,10 @@ export const site = {
   },
   serviceNote: "Prices include VAT. A 10% service charge is added for dine-in.",
 } as const;
+
+export const NAV = [
+  { href: "/menu", label: "Menu" },
+  { href: "/about", label: "Our Story" },
+  { href: "/visit", label: "Visit" },
+  { href: "/contact", label: "Reserve" },
+] as const;

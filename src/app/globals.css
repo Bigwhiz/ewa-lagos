@@ -1,26 +1,172 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-ink: #12100e;
+  --color-ink-2: #1a1713;
+  --color-ink-3: #25211c;
+  --color-ivory: #f3ede3;
+  --color-paper: #f8f4ec;
+  --color-stone: #a0968a;
+  --color-stone-dark: #6b6257;
+  --color-brass: #c39c5e;
+  --color-brass-deep: #7d5f2e;
+  --color-line: rgb(243 237 227 / 0.14);
+  --color-line-dark: rgb(18 16 14 / 0.12);
+
+  --font-display: var(--font-cormorant), ui-serif, Georgia, serif;
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --tracking-eyebrow: 0.24em;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@layer base {
+  html {
+    color-scheme: dark;
+    -webkit-tap-highlight-color: transparent;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  body {
+    background: var(--color-ink);
+    color: var(--color-ivory);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11";
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: var(--color-brass);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 1.5px solid var(--color-brass);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@utility eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+}
+
+@utility container-page {
+  width: 100%;
+  max-width: 82rem;
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 4vw, 3rem);
+}
+
+/* Content rises in as it scrolls into view. CSS-only (scroll-driven animations), so it costs no JavaScript,
+   and browsers without support or visitors who prefer reduced motion simply see it in place. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 22%;
+    }
+  }
+}
+
+/* Header gains its background over the first 120px of scroll. This is a colour change, not movement,
+   so it applies with reduced motion too. Browsers without scroll timelines get a solid header. */
+.header-scrolled {
+  background-color: rgb(18 16 14 / 0.86);
+  border-color: var(--color-line);
+  backdrop-filter: blur(14px);
+}
+
+@supports (animation-timeline: scroll()) {
+  .header-scrolled {
+    background-color: transparent;
+    border-color: transparent;
+    backdrop-filter: none;
+    animation: header-solid linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 120px;
+  }
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
+}
+
+@keyframes header-solid {
+  to {
+    background-color: rgb(18 16 14 / 0.86);
+    border-color: var(--color-line);
+    backdrop-filter: blur(14px);
+  }
+}
+
+/* Native <dialog> slide-in for the order sheet. */
+dialog.sheet {
+  transition:
+    translate 0.5s var(--ease-out-expo),
+    opacity 0.3s ease,
+    overlay 0.5s allow-discrete,
+    display 0.5s allow-discrete;
+  translate: 0 0;
+  opacity: 1;
+}
+
+dialog.sheet:not([open]) {
+  translate: 100% 0;
+  opacity: 0;
+}
+
+@starting-style {
+  dialog.sheet[open] {
+    translate: 100% 0;
+    opacity: 0;
+  }
+}
+
+dialog.sheet::backdrop {
+  background: rgb(10 9 8 / 0.6);
+  backdrop-filter: blur(3px);
+  transition: opacity 0.4s ease, overlay 0.4s allow-discrete, display 0.4s allow-discrete;
+  opacity: 1;
+}
+
+dialog.sheet:not([open])::backdrop {
+  opacity: 0;
+}
+
+@starting-style {
+  dialog.sheet[open]::backdrop {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  dialog.sheet,
+  dialog.sheet::backdrop {
+    transition: none;
+  }
 }
